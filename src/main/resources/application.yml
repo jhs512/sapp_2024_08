@@ -1,6 +1,8 @@
 server:
   port: 8020
 spring:
+  profiles:
+    include: secret
   datasource:
     url: jdbc:h2:./db_dev;MODE=MySQL
     username: sa

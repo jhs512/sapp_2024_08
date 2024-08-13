@@ -10,6 +10,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
 
@@ -32,4 +33,12 @@ public class Member {
     @Column(unique = true)
     private String username;
     private String password;
+
+    public List<String> getAuthoritiesAsStringList() {
+        if (username.equals("admin")) {
+            return List.of("ROLE_ADMIN");
+        }
+
+        return List.of();
+    }
 }
