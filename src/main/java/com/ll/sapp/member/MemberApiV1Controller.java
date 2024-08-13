@@ -39,4 +39,26 @@ public class MemberApiV1Controller {
                 .header("Authorization", accessToken)
                 .body(MemberDto.from(member));
     }
+
+    public record MemberJoinReqBody(
+            @NotBlank String username,
+            @NotBlank String password
+    ) {
+    }
+
+    @PostMapping("")
+    public ResponseEntity<MemberDto> join(
+            @Valid @RequestBody MemberJoinReqBody reqBody
+    ) {
+        memberService.findByUsername(reqBody.username)
+                .ifPresent(member -> {
+                    throw new RuntimeException("이미 존재하는 사용자입니다.");
+                });
+
+        Member member = memberService.join(reqBody.username, reqBody.password);
+
+        return ResponseEntity
+                .ok()
+                .body(MemberDto.from(member));
+    }
 }
