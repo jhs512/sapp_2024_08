@@ -10,6 +10,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class MemberService {
+    private final AuthTokenService authTokenService;
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -24,6 +25,7 @@ public class MemberService {
         Member member = new Member();
         member.setUsername(username);
         member.setPassword(passwordEncoder.encode(password));
+        member.setRefreshToken(authTokenService.genRefreshToken());
         memberRepository.save(member);
 
         return member;

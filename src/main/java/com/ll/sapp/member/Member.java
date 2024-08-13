@@ -34,6 +34,9 @@ public class Member {
     private String username;
     private String password;
 
+    @Column(unique = true)
+    private String refreshToken;
+
     public List<String> getAuthoritiesAsStringList() {
         if (username.equals("admin")) {
             return List.of("ROLE_ADMIN");

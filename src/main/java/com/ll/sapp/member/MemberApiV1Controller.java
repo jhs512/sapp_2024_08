@@ -43,10 +43,12 @@ public class MemberApiV1Controller {
         }
 
         String accessToken = authTokenService.genAccessToken(member);
+        String refreshToken = member.getRefreshToken();
 
         return ResponseEntity
                 .ok()
                 .header("Authorization", accessToken)
+                .header("Refresh-Token", refreshToken)
                 .body(MemberDto.from(member));
     }
 
