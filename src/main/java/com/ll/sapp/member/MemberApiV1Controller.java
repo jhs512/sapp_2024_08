@@ -4,10 +4,10 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/members")
@@ -15,6 +15,16 @@ import org.springframework.web.bind.annotation.RestController;
 public class MemberApiV1Controller {
     private final MemberService memberService;
     private final AuthTokenService authTokenService;
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping
+    public List<MemberDto> getMembers() {
+        List<Member> members = memberService.findAllByOrderByIdDesc();
+
+        return members.stream()
+                .map(MemberDto::from)
+                .toList();
+    }
 
     public record MemberLoginReqBody(
             @NotBlank String username,

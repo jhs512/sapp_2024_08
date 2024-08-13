@@ -36,7 +36,7 @@ public class PostApiV1Controller {
     }
 
 
-    public record WritePostReqBody(
+    public record PostWriteReqBody(
             @NotBlank String title,
             @NotBlank String content
     ) {
@@ -45,7 +45,7 @@ public class PostApiV1Controller {
     @PreAuthorize("isAuthenticated()")
     @PostMapping
     public ResponseEntity<PostDto> writePost(
-            @Valid @RequestBody WritePostReqBody reqBody,
+            @Valid @RequestBody PostApiV1Controller.PostWriteReqBody reqBody,
             Principal principal
     ) {
         Member member = memberService.findByUsername(principal.getName()).get();
@@ -56,7 +56,7 @@ public class PostApiV1Controller {
     }
 
 
-    public record ModifyPostReqBody(
+    public record PostModifyReqBody(
             @NotBlank String title,
             @NotBlank String content
     ) {
@@ -66,7 +66,7 @@ public class PostApiV1Controller {
     @PutMapping("/{id}")
     public ResponseEntity<PostDto> modifyPost(
             @PathVariable long id,
-            @Valid @RequestBody ModifyPostReqBody reqBody,
+            @Valid @RequestBody PostApiV1Controller.PostModifyReqBody reqBody,
             Principal principal
     ) {
         Member member = memberService.findByUsername(principal.getName()).get();
