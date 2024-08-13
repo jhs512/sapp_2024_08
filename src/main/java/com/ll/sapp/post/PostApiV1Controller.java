@@ -1,5 +1,7 @@
 package com.ll.sapp.post;
 
+import com.ll.sapp.member.Member;
+import com.ll.sapp.member.MemberService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
@@ -7,12 +9,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/posts")
 @RequiredArgsConstructor
 public class PostApiV1Controller {
+    private final MemberService memberService;
     private final PostService postService;
 
     @GetMapping("")
@@ -40,8 +44,12 @@ public class PostApiV1Controller {
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping
-    public ResponseEntity<PostDto> writePost(@Valid @RequestBody WritePostReqBody reqBody) {
-        Post post = postService.write(reqBody.title, reqBody.content);
+    public ResponseEntity<PostDto> writePost(
+            @Valid @RequestBody WritePostReqBody reqBody,
+            Principal principal
+    ) {
+        Member member = memberService.findByUsername(principal.getName()).get();
+        Post post = postService.write(member, reqBody.title, reqBody.content);
         return ResponseEntity
                 .ok()
                 .body(PostDto.from(post));
@@ -56,8 +64,19 @@ public class PostApiV1Controller {
 
     @PreAuthorize("isAuthenticated()")
     @PutMapping("/{id}")
-    public ResponseEntity<PostDto> modifyPost(@PathVariable long id, @Valid @RequestBody ModifyPostReqBody reqBody) {
+    public ResponseEntity<PostDto> modifyPost(
+            @PathVariable long id,
+            @Valid @RequestBody ModifyPostReqBody reqBody,
+            Principal principal
+    ) {
+        Member member = memberService.findByUsername(principal.getName()).get();
+
         Post post = postService.findById(id).get();
+
+        if (!post.getAuthor().equals(member)) {
+            throw new RuntimeException("작성자만 수정할 수 있습니다.");
+        }
+
         postService.modify(post, reqBody.title, reqBody.content);
         return ResponseEntity
                 .ok()

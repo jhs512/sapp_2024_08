@@ -1,6 +1,5 @@
-package com.ll.sapp.post;
+package com.ll.sapp.member;
 
-import com.ll.sapp.member.Member;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,7 +19,7 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @Getter
 @Setter
 @EntityListeners(AuditingEntityListener.class)
-public class Post {
+public class Member {
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
@@ -30,9 +29,7 @@ public class Post {
     @LastModifiedDate
     private LocalDateTime modifyDate;
 
-    @ManyToOne
-    private Member author;
-
-    private String title;
-    private String content;
+    @Column(unique = true)
+    private String username;
+    private String password;
 }

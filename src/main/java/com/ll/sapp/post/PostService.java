@@ -1,5 +1,6 @@
 package com.ll.sapp.post;
 
+import com.ll.sapp.member.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,8 +20,9 @@ public class PostService {
         return postRepository.findById(id);
     }
 
-    public Post write(String title, String content) {
+    public Post write(Member author, String title, String content) {
         Post post = new Post();
+        post.setAuthor(author);
         post.setTitle(title);
         post.setContent(content);
         postRepository.save(post);
