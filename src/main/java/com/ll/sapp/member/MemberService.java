@@ -42,4 +42,8 @@ public class MemberService {
     public List<Member> findAllByOrderByIdDesc() {
         return memberRepository.findAllByOrderByIdDesc();
     }
+
+    public Optional<Member> findByRefreshToken(String refreshToken) {
+        return memberRepository.findByRefreshToken(refreshToken);
+    }
 }

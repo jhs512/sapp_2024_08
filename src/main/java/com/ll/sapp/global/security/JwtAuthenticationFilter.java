@@ -1,6 +1,8 @@
 package com.ll.sapp.global.security;
 
 import com.ll.sapp.member.AuthTokenService;
+import com.ll.sapp.member.Member;
+import com.ll.sapp.member.MemberService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -17,6 +19,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -41,9 +44,27 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         try {
             tokenData = authTokenService.getDataFrom(accessToken);
-        } catch (Exception e) {
-            filterChain.doFilter(request, response);
-            return;
+        }
+        catch (Exception e) {
+            String refreshToken = request.getHeader("Refresh-Token");
+
+            if ( refreshToken == null ) {
+                filterChain.doFilter(request, response);
+                return;
+            }
+
+            Optional<Member> opMember = memberService.findByRefreshToken(refreshToken);
+
+            if ( opMember.isEmpty() ) {
+                filterChain.doFilter(request, response);
+                return;
+            }
+
+            Member member = opMember.get();
+
+            accessToken = authTokenService.genAccessToken(member);
+            response.setHeader("Authorization", accessToken);
+            tokenData = authTokenService.getDataFrom(accessToken);
         }
 
         String username = (String) tokenData.get("username");
@@ -59,4 +80,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         filterChain.doFilter(request, response);
     }
+
+    private final MemberService memberService;
 }
